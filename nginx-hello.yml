@@ -1,0 +1,46 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nginx
+
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: nginx
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+    # This is the pod template of 1 container
+    spec:
+      containers:
+        - name: app
+          image: nginxdemos/hello
+          ports:
+            - containerPort: 80
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-service
+  namespace: nginx
+spec:
+  # https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  selector:
+    app: nginx-app
+  ports:
+    - name: nginx
+      protocol: TCP
+      port: 80
+      targetPort: 80
