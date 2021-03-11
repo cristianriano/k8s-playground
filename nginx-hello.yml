@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: nginxdemos/hello
+          image: cristianriano/nginxdemo
           ports:
             - containerPort: 80
 
