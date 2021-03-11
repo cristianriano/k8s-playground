@@ -26,6 +26,18 @@ spec:
           image: cristianriano/nginxdemo
           ports:
             - containerPort: 80
+        - name: prometheus-exporter
+          # https://github.com/nginxinc/nginx-prometheus-exporter
+          image: nginx/nginx-prometheus-exporter:0.8.0
+          # Can be configiured either with flags or ENV variables
+          args:
+            - -nginx.scrape-uri=http://localhost:80/nginx_status
+          # env:
+          #   - name: SCRAPE_URI
+          #     value: "http://localhost:80/nginx_status"
+          ports:
+            - name: metrics
+              containerPort: 9113
 
 ---
 
