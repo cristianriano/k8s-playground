@@ -1,0 +1,14 @@
+alertmanager:
+  enabled: false
+pushgateway:
+  enabled: false
+server:
+  enabled: true
+  podLabels:
+    app.kubernetes.io/name: prometheus-server
+  # persistentVolume:
+  #   enabled: false # Will use emptyDir (exists during the lifetime of the pod)
+  # statefulSet:
+  #   enabled: false # Can't be scale unless is statefulSet
+podSecurityPolicy:
+  enabled: true

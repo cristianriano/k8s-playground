@@ -1,0 +1,32 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: prometheus
+  labels:
+    app.kubernetes.io/name: prometheus
+
+---
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: prometheus-exporter-egress
+  namespace: prometheus
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+      component: server
+  policyTypes:
+    - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: nginx
+    - podSelector:
+        matchLabels:
+          prometheus-metrics: "true"
+    ports:
+      - protocol: TCP
+        port: 9113

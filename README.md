@@ -78,3 +78,34 @@ For testing we can generate our self-signed certificates
 openssl req -x509 -newkey rsa:4096 -keyout domain.key -out domain.cert -days 365 -sha256
 base64 domain.key | pbcopy
 ```
+
+## Helm Charts
+
+Helm provides an interface to define, install, update and share pre-configured components for a K8S cluster as repositories.\
+To get charts use the [Artifact Hub](https://artifacthub.io/)
+
+1. Install helm locally `brew install helm`
+2. Add the desired repo, search the chart you need and install (it will be installed in the cluster than
+kubectl is pointing to)
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+
+helm search repo prometheus-community/prometheus
+
+helm install my-prometheus --values prometheus-values.yml prometheus-community/grafana
+```
+
+3. When installing provide a yml file to override the default values
+4. You can list the current running charts with `helm ls`
+
+## Prometheus
+
+In charge of collecting metrics and trigger alerts. It has 3 components:
+- Storage (Time Series Database in Disk)
+- Retrieval (pull)
+- HTTP Servier
+
+Install it with helm
+`helm install prometheus prometheus-community/prometheus --values prometheus-values.yml -n prometheus-namespace`

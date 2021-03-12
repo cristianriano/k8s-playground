@@ -28,7 +28,11 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: nginx
-    # This is the pod template of 1 container
+        prometheus-metrics: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9113"
     spec:
       containers:
         - name: app
@@ -92,6 +96,33 @@ spec:
               # Either number or number
               name: nginx
               # number: 80
+
+---
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: pod-exporter-ingress
+  namespace: nginx
+spec:
+  podSelector:
+    matchLabels:
+      prometheus-metrics: "true"
+      # app.kubernetes.io/name: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 9113
+    from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+          component: server
+    - namespaceSelector:
+        matchLabels:
+          name: prometheus
 
 ---
 
