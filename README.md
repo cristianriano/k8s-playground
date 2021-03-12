@@ -67,3 +67,14 @@ minikube addons enable ingress
 Also make sure the DNS record is pointing to the IP where the Ingress Controller is running.\
 For testing edit `/etc/hosts` file with the ip assigned to the Ingress. Check the IP by running\
 `kubectl get ingress -n nginx --watch`
+
+### TLS
+
+To add TLS support to the Ingress controller first inject the SSL certificate and key encoded base64 in a secret resource.\
+And add the TLS config on the Ingress spec.\
+
+For testing we can generate our self-signed certificates
+```
+openssl req -x509 -newkey rsa:4096 -keyout domain.key -out domain.cert -days 365 -sha256
+base64 domain.key | pbcopy
+```
