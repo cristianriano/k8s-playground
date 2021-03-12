@@ -65,3 +65,26 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: nginx-ingress
+  namespace: nginx
+spec:
+  rules:
+  # Add more entries to the array for different domains or subdomains (one for each)
+  - host: nginx-example.com
+    http:
+      paths:
+      - path: '/'
+        pathType: Prefix # or Exact
+        backend:
+          service:
+            name: nginx-service
+            port:
+              # Either number or number
+              name: nginx
+              # number: 80
