@@ -1,0 +1,6 @@
+ingress:
+  enabled: true
+  hosts:
+    - grafana.nginx-example.com
+persistence:
+  enabled: false

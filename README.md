@@ -53,6 +53,8 @@ Rename:\
 
 - When getting an error applying/validating the yaml you can get the description of the expected params like
 `kubectl explain ingress.spec.rules.http.paths.backend.service`
+- By default services can reach each other among namespaces, which for testing is great. Nevertheless there
+are the valid NetworkPolicies defined
 
 ## Ingress
 
@@ -107,5 +109,20 @@ In charge of collecting metrics and trigger alerts. It has 3 components:
 - Retrieval (pull)
 - HTTP Servier
 
-Install it with helm
+Install it with helm\
 `helm install prometheus prometheus-community/prometheus --values prometheus-values.yml -n prometheus-namespace`
+
+To check which values can be configured\
+`helm show values prometheus-community/prometheus > values.yml`
+
+## Grafana
+
+Webapp for metrics and logs visualizations
+
+Install it with helm\
+`helm install grafana grafana/grafana --values grafana-values.yml -n grafana`
+
+Available values for configuration [here](https://artifacthub.io/packages/helm/grafana/grafana#configuration)
+
+Once installed to get `admin` user password:\
+`kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`

@@ -20,13 +20,13 @@ spec:
   policyTypes:
     - Egress
   egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: nginx
-    - podSelector:
-        matchLabels:
-          prometheus-metrics: "true"
-    ports:
-      - protocol: TCP
-        port: 9113
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: nginx
+          podSelector:
+            matchLabels:
+              prometheus-metrics: "true"
+      ports:
+        - protocol: TCP
+          port: 9113

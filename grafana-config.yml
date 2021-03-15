@@ -1,0 +1,58 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: grafana
+  labels:
+    app.kubernetes.io/name: grafana
+
+---
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: grafana-to-prometheus-egress
+  namespace: grafana
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: prometheus
+          podSelector:
+            matchLabels:
+              app: prometheus
+              component: server
+      ports:
+        - protocol: TCP
+          port: 9090
+
+---
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: grafana-from-prometheus-ingress
+  namespace: prometheus
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+      component: server
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: grafana
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: grafana
+      ports:
+        - protocol: TCP
+          port: 9090

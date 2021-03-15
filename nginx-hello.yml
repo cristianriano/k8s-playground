@@ -112,17 +112,17 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-  - ports:
-    - protocol: TCP
-      port: 9113
-    from:
-    - podSelector:
-        matchLabels:
-          app: prometheus
-          component: server
-    - namespaceSelector:
-        matchLabels:
-          name: prometheus
+    - ports:
+        - protocol: TCP
+          port: 9113
+      from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+              component: server
+          namespaceSelector:
+            matchLabels:
+              name: prometheus
 
 ---
 
