@@ -30,6 +30,9 @@ Use:\
 Rename:\
 `kubectl config rename-context old new`
 
+Change Namespace for subsequent commands:\
+`kubectl config set-context --current --namespace=prometheus`
+
 ### Get/Update Info
 
 - Apply:
@@ -55,6 +58,7 @@ Rename:\
 `kubectl explain ingress.spec.rules.http.paths.backend.service`
 - By default services can reach each other among namespaces, which for testing is great. Nevertheless there
 are the valid NetworkPolicies defined
+- Kube-DNS sets a url for each service by default like `http://service.namespace.svc.cluster.local`
 
 ## Ingress
 
@@ -100,7 +104,8 @@ helm install my-prometheus --values prometheus-values.yml prometheus-community/g
 ```
 
 3. When installing provide a yml file to override the default values
-4. You can list the current running charts with `helm ls`
+4. You can list the current running charts with `helm ls --all-namespaces`
+5. Also use helm for uninstalling (specify the namespace) `helm uninstall grafana --namespace grafana`
 
 ## Prometheus
 

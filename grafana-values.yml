@@ -4,3 +4,31 @@ ingress:
     - grafana.nginx-example.com
 persistence:
   enabled: false
+# Example for datasources file https://grafana.com/docs/grafana/latest/administration/provisioning/#example-data-source-config-file
+datasources:
+  datasources.yaml: # Must be name like this!
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        # One of https://grafana.com/docs/grafana/latest/datasources/#supported-data-sources
+        type: prometheus
+        # proxy or direct (Server or Browser in the UI)
+        access: proxy
+        url: http://prometheus-server.prometheus
+        editable: true
+# Example for dashboards https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+    - name: nginx
+      folder: Default
+      type: file
+      disableDeletion: false
+      # updateIntervalSeconds: 10
+      allowUiUpdates: true
+      options:
+        # Helm mounts files from the dashboardsConfigMaps here
+        path: /var/lib/grafana/dashboards/nginx
+dashboardsConfigMaps:
+  nginx: grafana-dashboard-nginx
