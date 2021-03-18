@@ -3,6 +3,8 @@ apiVersion: v1
 metadata:
   name: grafana-dashboard-nginx
   namespace: grafana
+  labels:
+    grafana-dashboard: "true"
 data:
   dashboards.json: |
     {

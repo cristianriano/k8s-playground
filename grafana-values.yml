@@ -16,12 +16,30 @@ datasources:
         access: proxy
         url: http://prometheus-server.prometheus
         editable: true
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana-dashboard
+    provider:
+      allowUiUpdates: true
+dashboards:
+  default:
+    prometheus-stats:
+      # Ref: https://grafana.com/dashboards/2
+      gnetId: 2
+      revision: 2
+      datasource: Prometheus
+    k8s-cluster:
+      gnetId: 3149
+      revision: 1
+      datasource: Prometheus
+
 # Example for dashboards https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
 dashboardProviders:
-  dashboardproviders.yaml:
+  dashboardproviders.yaml: # Must be name like this!
     apiVersion: 1
     providers:
-    - name: nginx
+    - name: default
       folder: Default
       type: file
       disableDeletion: false
@@ -29,6 +47,8 @@ dashboardProviders:
       allowUiUpdates: true
       options:
         # Helm mounts files from the dashboardsConfigMaps here
-        path: /var/lib/grafana/dashboards/nginx
-dashboardsConfigMaps:
-  nginx: grafana-dashboard-nginx
+        path: /var/lib/grafana/dashboards/default
+
+# With the following option can mount a ConfigMap as dashboard but it doesn't monitor changes (I think)
+# dashboardsConfigMaps:
+#   nginx: grafana-dashboard-nginx

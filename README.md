@@ -106,6 +106,7 @@ helm install my-prometheus --values prometheus-values.yml prometheus-community/g
 3. When installing provide a yml file to override the default values
 4. You can list the current running charts with `helm ls --all-namespaces`
 5. Also use helm for uninstalling (specify the namespace) `helm uninstall grafana --namespace grafana`
+6. Update `helm upgrade grafana grafana/grafana --namespace grafana --values grafana-values.yml`
 
 ## Prometheus
 
