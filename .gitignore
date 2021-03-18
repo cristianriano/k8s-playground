@@ -1,0 +1,7 @@
+# Jsonnet dependencies
+vendor/*
+
+# Jsonnet output
+*.json
+!jsonnetfile.json
+!jsonnetfile.lock.json

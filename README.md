@@ -131,3 +131,19 @@ Available values for configuration [here](https://artifacthub.io/packages/helm/g
 
 Once installed to get `admin` user password:\
 `kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`
+
+## Jsonnet
+
+Create and reuse json as code. To install\
+`go get github.com/google/go-jsonnet/cmd/jsonnet`
+
+To install the formater as well\
+`go get github.com/google/go-jsonnet/cmd/jsonnetfmt`
+
+*Note: If using asdf run after installation `asdf reshim golang`*
+
+To generate Grafana dashboards install grafana-builder and run jsonnet
+```
+jb install
+jsonnet -J vendor/ -m . dashboards.jsonnet
+```
