@@ -144,9 +144,10 @@ To install the formater as well\
 
 *Note: If using asdf run after installation `asdf reshim golang`*
 
-To generate Grafana dashboards install [Grafonet](https://grafana.github.io/grafonnet-lib/getting-started/) and run jsonnet
+To generate Grafana dashboards install [Grafonet 7.0](https://grafana.github.io/grafonnet-lib/getting-started/) and run jsonnet
 ```
-jb install
+jb install https://github.com/grafana/grafonnet-lib/grafonnet-7.0
+# The following will generate nginx.json file with the dashboard config
 jsonnet -J vendor/ -m . dashboards.jsonnet
 kubectl create configmap grafana-dashboard-nginx-json --from-file=nginx.json --dry-run=client -o yaml -n grafana | yq e '.metadata.labels.grafana-dashboard = "true"' - | kubectl apply -f -
 ```

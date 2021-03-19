@@ -1,32 +1,31 @@
-local grafana = import 'grafonnet/grafana.libsonnet';
+local grafana = import 'grafonnet-7.0/grafana.libsonnet';
 local dashboard = grafana.dashboard;
-local singlestat = grafana.singlestat;
-local prometheus = grafana.prometheus;
+local graph = grafana.panel.graph;
+local prometheus = grafana.target.prometheus;
 
 {
   "nginx.json": dashboard.new(
-    'Nginx',
-    schemaVersion=16,
+    title='Nginx',
     tags=['nginx'],
-    editable=true
+    refresh="30s"
+  )
+  .setTime(
+    from="now-1h"
   )
   .addPanel(
-    singlestat.new(
-      'Avg req per minute',
-      format='s',
-      datasource='Prometheus',
-      span=2,
-      valueName='current',
+    graph.new(
+      datasource="Prometheus",
+      title="Avg req per min"
+    )
+    .setGridPos(
+      h=9,
+      w=12,
     )
     .addTarget(
-      prometheus.target(
-        'rate(nginx_http_requests_total[5m])/5',
+      prometheus.new(
+        expr="rate(nginx_http_requests_total[5m])/5",
+        legendFormat="POD: {{pod_template_hash}}"
       )
-    ), gridPos={
-      x: 0,
-      y: 0,
-      w: 24,
-      h: 3,
-    },
+    )
   )
 }

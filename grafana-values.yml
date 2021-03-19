@@ -16,6 +16,7 @@ datasources:
         access: proxy
         url: http://prometheus-server.prometheus
         editable: true
+        isDefault: true
 sidecar:
   dashboards:
     enabled: true
