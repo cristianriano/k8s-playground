@@ -23,13 +23,14 @@ sidecar:
     provider:
       allowUiUpdates: true
 dashboards:
-  default:
-    prometheus-stats:
+  prometheus:
+    stats:
       # Ref: https://grafana.com/dashboards/2
       gnetId: 2
       revision: 2
       datasource: Prometheus
-    k8s-cluster:
+  k8s:
+    cluster:
       gnetId: 3149
       revision: 1
       datasource: Prometheus
@@ -39,15 +40,24 @@ dashboardProviders:
   dashboardproviders.yaml: # Must be name like this!
     apiVersion: 1
     providers:
-    - name: default
-      folder: Default
+    - name: prometheus-external
+      folder: Prometheus
       type: file
       disableDeletion: false
       # updateIntervalSeconds: 10
       allowUiUpdates: true
       options:
         # Helm mounts files from the dashboardsConfigMaps here
-        path: /var/lib/grafana/dashboards/default
+        path: /var/lib/grafana/dashboards/prometheus
+    - name: k8s-external
+      folder: K8S
+      type: file
+      disableDeletion: false
+      # updateIntervalSeconds: 10
+      allowUiUpdates: true
+      options:
+        # Helm mounts files from the dashboardsConfigMaps here
+        path: /var/lib/grafana/dashboards/k8s
 
 # With the following option can mount a ConfigMap as dashboard but it doesn't monitor changes (I think)
 # dashboardsConfigMaps:

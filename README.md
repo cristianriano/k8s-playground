@@ -137,14 +137,16 @@ Once installed to get `admin` user password:\
 
 Create and reuse json as code. To install\
 `go get github.com/google/go-jsonnet/cmd/jsonnet`
+`go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb`
 
 To install the formater as well\
 `go get github.com/google/go-jsonnet/cmd/jsonnetfmt`
 
 *Note: If using asdf run after installation `asdf reshim golang`*
 
-To generate Grafana dashboards install grafana-builder and run jsonnet
+To generate Grafana dashboards install [Grafonet](https://grafana.github.io/grafonnet-lib/getting-started/) and run jsonnet
 ```
 jb install
 jsonnet -J vendor/ -m . dashboards.jsonnet
+kubectl create configmap grafana-dashboard-nginx-json --from-file=nginx.json --dry-run=client -o yaml -n grafana | yq e '.metadata.labels.grafana-dashboard = "true"' - | kubectl apply -f -
 ```
