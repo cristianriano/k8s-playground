@@ -34,7 +34,9 @@ kubectl apply -f resources/11-nginx-hello.yml \
 More info in [Ingress section](#ingress)\
 `minikube addons enable ingress`
 
-6. _(Optional)_ Use [Helm](#helm-charts) to install [Prometheus](#prometheus) and [Grafana](#grafana) for basic monitoring.
+6. _(Optional)_ Using [Traefik](#traefik) as a proxy to the nginx containers
+
+7. _(Optional)_ Use [Helm](#helm-charts) to install [Prometheus](#prometheus) and [Grafana](#grafana) for basic monitoring.
 
 **NOTE:** The cluster is transient, not persisted. Once you deleted you have to create everything from scratch.
 If everything is configured you can start the cluster with basic config running the script `setup_example`.
@@ -114,6 +116,43 @@ For testing we can generate our self-signed certificates for the testing domain
 openssl req -x509 -newkey rsa:4096 -keyout <domain>.key -out <domain>.cert -days 365 -sha256
 base64 <domain>.key | pbcopy
 ```
+
+## Traefik
+
+[Traefik proxy](https://traefik.io/traefik/) is an OpenSource application proxy. Can run as a standalone
+container or inside a Kubernetes cluster. Is configuration is dynamic allowing to add or remove services
+as the become available or not.
+
+In Kubernetes Traefik is notified when an Ingress resources is created/changed via the Kubernetes API
+and updates the configuration.
+
+First create the role for Traefik to have permissions and be notified about new Ingress
+
+`kubectl apply -f resources/00-traefik-role.yml`
+
+Then create the deployment and service (in the default namespace). The service will be of type LoadBalancer which means is up to the cluster
+to expose it. Minikube has a [tunnel functionality](https://minikube.sigs.k8s.io/docs/handbook/accessing/#loadbalancer-access) to allow access.
+
+```
+kubectl apply -f resources/01-traefik-service.yml
+minikube tunnel # start it in another terminal
+```
+
+To check the exposed IP run `kubectl get svc --watch`. Use the external-ip to reach the service
+
+```
+NAME                        TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)          AGE
+kubernetes                  ClusterIP      10.96.0.1        <none>           443/TCP          4m15s
+traefik-dashboard-service   LoadBalancer   10.103.204.156   10.103.204.156   8080:31422/TCP   65s
+traefik-web-service         LoadBalancer   10.110.30.175    10.110.30.175    80:32648/TCP     65s
+```
+
+Access the dashboard in `10.103.204.156:8080/dashboard` and make sure the nginx service appears.
+Once it does nginx should be reachable under `10.110.30.175/nginx`
+
+**Remember that for Traefik to detect a new Ingress in another Namespace a NetworkPolicy should be in place for both incoming and outgoing traffic!!**
+
+_For some reason pointing the DNS to Traefik doesn't work._
 
 ## Helm Charts
 

@@ -5,6 +5,8 @@ minikube addons enable ingress
 
 sleep 20
 kubectl apply -f resources/11-nginx-hello.yml \
+              -f resources/00-traefik-role.yml \
+              -f resources/01-traefik-service.yml \
               -f resources/11-nginx-ingress.yml \
               -f resources/12-prometheus-config.yml \
               -f resources/13-grafana-config.yml \

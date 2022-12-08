@@ -10,6 +10,7 @@ spec:
     secretName: nginx-secret-tls
   rules:
   # Add more entries to the array for different domains or subdomains (one for each)
+  # Used by Minikube Ingress addon. Serves TLS
   - host: nginx-example.com
     http:
       paths:
@@ -22,6 +23,16 @@ spec:
               # Either number or name
               name: nginx
               # number: 80
+  # Used to access it from Traefik proxy on /nginx path (no TLS)
+  - http:
+      paths:
+      - path: /nginx
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              name: nginx
 
 ---
 
