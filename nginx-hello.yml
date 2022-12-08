@@ -93,7 +93,7 @@ spec:
           service:
             name: nginx-service
             port:
-              # Either number or number
+              # Either number or name
               name: nginx
               # number: 80
 

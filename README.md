@@ -4,18 +4,40 @@ All the experiments are running on Minikube
 
 ## Installation
 
-You need a vm driver so minikube can run the nodes.\
-Can use `docker` if available or `hyperkit`
+You need to install minikube to run this demo and a driver.
 
 1. `brew install minikube` (This will also install `kubectl`. Formulae: kubernetes-cli)
-2. Install the driver with brew as well
-3. Start the cluster (if there is an error use `--v=7 --alsologtostderr` flags to debug)\
-`minikube start --driver=docker`
-4. You can specify the max resources used by minikube as well when starting `--cpus 4 --memory 8192`
+
+2. Install the desired driver with brew (more available [here](https://minikube.sigs.k8s.io/docs/drivers/)):
+  - `docker` (already available but doesn't support Ingress)
+  - `virtualbox` (not working atm)
+  - `hyperkit` (recommended)
+
+3. Start the cluster with\
+`minikube start --driver=<step_2>`
+
+  - If there is an error use `--v=7 --alsologtostderr` flags to debug
+  - Is possible to specify the max resources used by minikube as well when starting `--cpus 4 --memory 8192`
+
+4. Enable Ingress to access the cluster from the local machine. Remember to use a compatible driver.
+More info in [Ingress section](#ingress)\
+`minikube addons enable ingress`
+
+5. Install a basic nginx service with 2 pods `kubectl apply -f nginx-hello.yml`. Includes
+  - Namespace nginx
+  - Deployment and service
+  - Ingress for the service
+  - Network policy
+  - Secrets for TLS (self signes more [here](#tls))
+
+6. _(Optional)_ Use [Helm](#helm-charts) to install [Prometheus](#prometheus) and [Grafana](#grafana) for basic monitoring.
+
+**NOTE:** The cluster is transient, not persisted. Once you deleted you have to create everything from scratch.
 
 ## Commands
 
-The main way to interact with the cluster is with `kubectl`. But it can get cumbersome for some tasks so we can use [K9 CLI](https://k9scli.io/).\
+The main way to interact with the cluster is with `kubectl`. But it can get cumbersome for some tasks
+so is recommended to use **[K9 CLI](https://k9scli.io/)**.\
 Install with `brew install derailed/k9s/k9s`
 
 ### Contexts
@@ -66,23 +88,26 @@ First we need to install an ingress controller implementation. We would use K8S 
 This will create the `IngressController` pod in `kube-system` namespace. For this we need use a driver compatible with ingress.
 
 ```
-minikube start --driver=virtualbox
+minikube start --driver=hyperkit
 minikube addons enable ingress
 ```
 
-Also make sure the DNS record is pointing to the IP where the Ingress Controller is running.\
-For testing edit `/etc/hosts` file with the ip assigned to the Ingress. Check the IP by running\
+Also make sure the DNS record is pointing to the IP where the Ingress Controller is running.
+
+For testing edit `/etc/hosts` file (with sudo) and point the ip assigned to the Ingress to `nginx-example.com` (you can test it using ping).\
+Check the IP by running\
 `kubectl get ingress -n nginx --watch`
 
 ### TLS
 
-To add TLS support to the Ingress controller first inject the SSL certificate and key encoded base64 in a secret resource.\
-And add the TLS config on the Ingress spec.\
+To add TLS support to the Ingress controller first inject the SSL certificate and key, encoded base64 in a secret resource.\
+And add the TLS config on the Ingress spec. (check the [manifest file](./nginx-hello.yml) where the secret is already defined)
 
-For testing we can generate our self-signed certificates
+For testing we can generate our self-signed certificates for the testing domain
+(already provided in the repo using `nginx-example.com` domain)
 ```
-openssl req -x509 -newkey rsa:4096 -keyout domain.key -out domain.cert -days 365 -sha256
-base64 domain.key | pbcopy
+openssl req -x509 -newkey rsa:4096 -keyout <domain>.key -out <domain>.cert -days 365 -sha256
+base64 <domain>.key | pbcopy
 ```
 
 ## Helm Charts
@@ -99,8 +124,6 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo add grafana https://grafana.github.io/helm-charts
 
 helm search repo prometheus-community/prometheus
-
-helm install my-prometheus --values prometheus-values.yml prometheus-community/grafana
 ```
 
 3. When installing provide a yml file to override the default values
@@ -115,8 +138,13 @@ In charge of collecting metrics and trigger alerts. It has 3 components:
 - Retrieval (pull)
 - HTTP Servier
 
+Prepare the installation\
+`kubectl apply -f prometheus-config.yml`
+This will create a namespace for the installation and a network policy to allow prometheus to pull
+metrics from the nginx containers
+
 Install it with helm\
-`helm install prometheus prometheus-community/prometheus --values prometheus-values.yml -n prometheus-namespace`
+`helm install prometheus prometheus-community/prometheus --values prometheus-values.yml -n prometheus`
 
 To check which values can be configured\
 `helm show values prometheus-community/prometheus > values.yml`
@@ -125,8 +153,19 @@ To check which values can be configured\
 
 Webapp for metrics and logs visualizations
 
+Prepare the installation\
+`kubectl apply -f grafana-config.yml`
+This will create the grafana namespace for the chart and a network policy to allow communication _from_
+and _to_ prometheus
+
 Install it with helm\
 `helm install grafana grafana/grafana --values grafana-values.yml -n grafana`
+
+The `grafana-values.yml` configure:
+- An ingress to access Grafana from `grafana.nginx-example.com` (remember to add it to `/etc/host` file too)
+- Configure Prometheus as a datasource
+- Install 2 dashboards from Grafana gallery and configure their datasources
+- A sidecar container that scans for ConfigMaps with `grafana-dashboard` label to automatically add dashboards (lable can be customized)
 
 Available values for configuration [here](https://artifacthub.io/packages/helm/grafana/grafana#configuration)
 
@@ -135,12 +174,14 @@ Once installed to get `admin` user password:\
 
 ## Jsonnet
 
-Create and reuse json as code. To install\
-`go get github.com/google/go-jsonnet/cmd/jsonnet`
-`go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb`
+Create and reuse json as code. To install
+```
+go install github.com/google/go-jsonnet/cmd/jsonnet
+go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
+```
 
 To install the formater as well\
-`go get github.com/google/go-jsonnet/cmd/jsonnetfmt`
+`go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest`
 
 *Note: If using asdf run after installation `asdf reshim golang`*
 
