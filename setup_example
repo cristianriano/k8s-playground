@@ -1,0 +1,18 @@
+#!/bin/bash
+
+minikube start --driver=hyperkit --cpus 4 --memory 8192
+minikube addons enable ingress
+
+sleep 20
+kubectl apply -f nginx-hello.yml
+
+sleep 2
+kubectl apply -f prometheus-config.yml
+helm install prometheus prometheus-community/prometheus --values prometheus-values.yml -n prometheus
+
+sleep 2
+kubectl apply -f grafana-config.yml
+kubectl apply -f grafana-dashboards.yml
+helm install grafana grafana/grafana --values grafana-values.yml -n grafana
+
+kubectl get ingress -n nginx

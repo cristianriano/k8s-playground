@@ -33,6 +33,7 @@ More info in [Ingress section](#ingress)\
 6. _(Optional)_ Use [Helm](#helm-charts) to install [Prometheus](#prometheus) and [Grafana](#grafana) for basic monitoring.
 
 **NOTE:** The cluster is transient, not persisted. Once you deleted you have to create everything from scratch.
+If everything is configured you can start the cluster with basic config running the script `setup_example`.
 
 ## Commands
 
