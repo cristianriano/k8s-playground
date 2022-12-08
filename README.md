@@ -19,16 +19,20 @@ You need to install minikube to run this demo and a driver.
   - If there is an error use `--v=7 --alsologtostderr` flags to debug
   - Is possible to specify the max resources used by minikube as well when starting `--cpus 4 --memory 8192`
 
-4. Enable Ingress to access the cluster from the local machine. Remember to use a compatible driver.
-More info in [Ingress section](#ingress)\
-`minikube addons enable ingress`
-
-5. Install a basic nginx service with 2 pods `kubectl apply -f nginx-hello.yml`. Includes
+4. Install a basic nginx service with 2 pods that includes
   - Namespace nginx
   - Deployment and service
   - Ingress for the service
   - Network policy
   - Secrets for TLS (self signes more [here](#tls))
+```
+kubectl apply -f resources/11-nginx-hello.yml \
+              -f resources/11-nginx-ingress.yml
+```
+
+5. Enable Ingress to access the cluster from the local machine. Remember to use a compatible driver.
+More info in [Ingress section](#ingress)\
+`minikube addons enable ingress`
 
 6. _(Optional)_ Use [Helm](#helm-charts) to install [Prometheus](#prometheus) and [Grafana](#grafana) for basic monitoring.
 
@@ -102,7 +106,7 @@ Check the IP by running\
 ### TLS
 
 To add TLS support to the Ingress controller first inject the SSL certificate and key, encoded base64 in a secret resource.\
-And add the TLS config on the Ingress spec. (check the [manifest file](./nginx-hello.yml) where the secret is already defined)
+And add the TLS config on the Ingress spec. (check the [manifest file](./resources/11-nginx-ingress.yml) where the secret is already defined)
 
 For testing we can generate our self-signed certificates for the testing domain
 (already provided in the repo using `nginx-example.com` domain)
@@ -140,7 +144,7 @@ In charge of collecting metrics and trigger alerts. It has 3 components:
 - HTTP Servier
 
 Prepare the installation\
-`kubectl apply -f prometheus-config.yml`
+`kubectl apply -f resources/12-prometheus-config.yml`
 This will create a namespace for the installation and a network policy to allow prometheus to pull
 metrics from the nginx containers
 
@@ -155,7 +159,7 @@ To check which values can be configured\
 Webapp for metrics and logs visualizations
 
 Prepare the installation\
-`kubectl apply -f grafana-config.yml`
+`kubectl apply -f resources/13-grafana-config.yml`
 This will create the grafana namespace for the chart and a network policy to allow communication _from_
 and _to_ prometheus
 
@@ -173,7 +177,7 @@ Available values for configuration [here](https://artifacthub.io/packages/helm/g
 Once installed to get `admin` user password:\
 `kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`
 
-## Jsonnet
+### Jsonnet
 
 Create and reuse json as code. To install
 ```
