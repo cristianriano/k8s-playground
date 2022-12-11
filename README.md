@@ -154,6 +154,29 @@ Once it does nginx should be reachable under `10.110.30.175/nginx`
 
 _For some reason pointing the DNS to Traefik doesn't work._
 
+Configuration in Traefik can refer to two different things:
+
+### Dynamic Configuration
+
+Contains everything that defines how the requests are handled by your system (middleware, routers, etc).
+This configuration can change and is seamlessly hot-reloaded, without any request interruption or connection loss.
+It's obtain from providers: whether an orchestrator, a service registry, or a plain old configuration file.
+
+It's defined in this [file](./resources/traefik_dynamic_config.yml)
+
+Mount it with
+
+`kubectl create configmap traefik-dynamic-config --from-file=resources/traefik_dynamic_config.yml -n default`
+
+### Static Configuration
+
+Also startup config. Sets up connections to providers and define the entrypoints Traefik will listen to (these elements don't change often).
+There are three different, mutually exclusive ways to define static configuration options in Traefik:
+
+1. In a configuration file (/etc/traefik/traefik.yml)
+2. In the command-line arguments (available arguments [here](https://doc.traefik.io/traefik/reference/static-configuration/cli/))
+3. As environment variables (available ENVS [here](https://doc.traefik.io/traefik/reference/static-configuration/env/))
+
 ## Helm Charts
 
 Helm provides an interface to define, install, update and share pre-configured components for a K8S cluster as repositories.\

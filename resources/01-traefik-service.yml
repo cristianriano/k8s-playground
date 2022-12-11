@@ -23,11 +23,33 @@ spec:
             # Insecure exposes the dashboard on port 8080
             - --api.insecure
             - --providers.kubernetesingress
+
+            # Static config
+            # - --entryPoints.web.address=:80 # (default)
+            - --providers.file.directory=/etc/conf.d/traefik_dynamic_config.yml
+
+            # Max idle (keep-alive) connections to keep per-host
+            - --serversTransport.maxIdleConnsPerHost=1
+            # Max time an idle (keep-alive) connection will remain idle before closing
+            - --serversTransport.forwardingTimeouts.idleConnTimeout=30s
+            # Amount of time to wait for a server's response headers after fully writing the request
+            - --serversTransport.forwardingTimeouts.responseHeaderTimeout=1s
+            # Max duration allowed for a connection to a backend server to be established
+            - --serversTransport.forwardingTimeouts.dialTimeout=1s
           ports:
             - name: web
               containerPort: 80
             - name: dashboard
               containerPort: 8080
+          volumeMounts:
+            - name: traefik-volume
+              # Must exist already
+              mountPath: /etc/conf.d/
+      volumes:
+        - name: traefik-volume
+          configMap:
+            # Name of the volume. Defined when created with `kubectl apply`
+            name: traefik-dynamic-config
 
 ---
 

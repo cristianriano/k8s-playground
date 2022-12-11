@@ -1,0 +1,14 @@
+http:
+  routers:
+    # Define a connection between requests and services
+    to-nginx:
+      rule: "Host(`nginx-example.com`) || PathPrefix(`/nginx/`)"
+      # If the rule matches, forward to the nginx service (declared below)
+      service: nginx
+
+  services:
+    # Define how to reach an existing service on our infrastructure
+    nginx:
+      loadBalancer:
+        servers:
+        - url: http://nginx-service.namespace.svc.cluster.local
