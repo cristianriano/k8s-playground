@@ -6,10 +6,23 @@
  * User Manual available at https://docs.gradle.org/7.4.2/userguide/building_java_projects.html
  * This project uses @Incubating APIs which are subject to change.
  */
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   kotlin("jvm") version "1.8.10"
   id("application")
   id("idea")
+
+  id("org.springframework.boot") version "3.0.5"
+  id("io.spring.dependency-management") version "1.1.0"
+}
+
+tasks.withType<KotlinCompile> {
+  kotlinOptions {
+    // Enforce null safety with Spring
+    freeCompilerArgs = listOf("-Xjsr305=strict")
+    jvmTarget = "17"
+  }
 }
 
 repositories {
@@ -23,6 +36,11 @@ dependencies {
   // Use the Kotlin JDK 8 standard library.
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+  // Spring
+  implementation("org.springframework.boot:spring-boot-starter-web")
+//  implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+  testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation(kotlin("test"))
 }
 

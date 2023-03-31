@@ -3,10 +3,12 @@
  */
 package com.example.shopping.list
 
-class App {
-    fun greet() = "Hello world!"
-}
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 
-fun main() {
-  println(App().greet())
+@SpringBootApplication
+open class App
+
+fun main(args: Array<String>) {
+  runApplication<App>(*args)
 }
