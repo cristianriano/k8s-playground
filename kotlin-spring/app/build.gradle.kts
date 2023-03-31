@@ -6,42 +6,32 @@
  * User Manual available at https://docs.gradle.org/7.4.2/userguide/building_java_projects.html
  * This project uses @Incubating APIs which are subject to change.
  */
-
 plugins {
-    // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.5.31"
-
-    // Apply the application plugin to add support for building a CLI application in Java.
-    application
+  kotlin("jvm") version "1.8.10"
+  id("application")
+  id("idea")
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+  // Use Maven Central for resolving dependencies.
+  mavenCentral()
 }
 
 dependencies {
-    // Align versions of all Kotlin components
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+  // Align versions of all Kotlin components
+  implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+  // Use the Kotlin JDK 8 standard library.
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    // Use the Kotlin JDK 8 standard library.
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-    // This dependency is used by the application.
-    implementation("com.google.guava:guava:30.1.1-jre")
+  testImplementation(kotlin("test"))
 }
 
-testing {
-    suites {
-        // Configure the built-in test suite
-        val test by getting(JvmTestSuite::class) {
-            // Use Kotlin Test test framework
-            useKotlinTest()
-        }
-    }
+tasks.test { // See 5️⃣
+  useJUnitPlatform() // JUnitPlatform for tests. See 6️⃣
 }
 
+val javaMainClass = "com.example.shopping.list.AppKt"
 application {
-    // Define the main class for the application.
-    mainClass.set("com.example.shopping.list.AppKt")
+  // Define the main class for the application.
+  mainClass.set(javaMainClass)
 }

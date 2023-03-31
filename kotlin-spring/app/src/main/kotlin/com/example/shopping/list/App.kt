@@ -4,12 +4,9 @@
 package com.example.shopping.list
 
 class App {
-    val greeting: String
-        get() {
-            return "Hello World!"
-        }
+    fun greet() = "Hello world!"
 }
 
 fun main() {
-    println(App().greeting)
+  println(App().greet())
 }
