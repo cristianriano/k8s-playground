@@ -7,6 +7,7 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
   kotlin("jvm") version "1.8.10"
@@ -46,6 +47,12 @@ dependencies {
 
 tasks.test { // See 5️⃣
   useJUnitPlatform() // JUnitPlatform for tests. See 6️⃣
+}
+
+val bootJar: BootJar by tasks
+bootJar.apply {
+  // Set name of the generated jar
+  archiveBaseName.set("app")
 }
 
 val javaMainClass = "com.example.shopping.list.AppKt"

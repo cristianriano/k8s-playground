@@ -7,3 +7,4 @@
 4. Add Spring dependency and plugin
    - Adds `bootJar` Gradle task that creates "fat jar" (with dependencies) in `app/build/libs/app.jar`
    - Can run it with a valid JRE `java -jar app/build/libs/app.jar`
+5. Customize the bootJar task if needed using `val bootJar: BootJar by tasks` and `bootJar.apply {}`
