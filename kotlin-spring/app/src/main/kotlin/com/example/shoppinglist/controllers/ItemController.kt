@@ -1,4 +1,4 @@
-package com.example.shopping.list.controllers
+package com.example.shoppinglist.controllers
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController

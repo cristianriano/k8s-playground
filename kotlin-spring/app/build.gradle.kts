@@ -56,7 +56,7 @@ bootJar.apply {
   archiveBaseName.set("app")
 }
 
-val javaMainClass = "com.example.shopping.list.AppKt"
+val javaMainClass = "com.example.shoppinglist.AppKt"
 application {
   // Define the main class for the application.
   mainClass.set(javaMainClass)
