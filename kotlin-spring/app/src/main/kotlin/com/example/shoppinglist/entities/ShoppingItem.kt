@@ -2,6 +2,7 @@ package com.example.shoppinglist.entities
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
@@ -10,7 +11,7 @@ import jakarta.persistence.Table
 @Table(name = "shopping_items")
 class ShoppingItem(
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY) // to avoid needing a sequence in MySQL
   var id: Long? = null,
   var name: String
 ) {
