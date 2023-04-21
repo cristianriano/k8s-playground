@@ -40,6 +40,9 @@ dependencies {
   // Spring
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+  // Kotlin reflection is needed to instantiate Hibernate components
+  implementation("org.jetbrains.kotlin:kotlin-reflect")
+  implementation("com.h2database:h2:2.1.214") // Move to only test dependency
 //  implementation("mysql:mysql-connector-java:8.0.32")
 //  implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
