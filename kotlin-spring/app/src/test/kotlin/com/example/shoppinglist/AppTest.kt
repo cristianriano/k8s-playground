@@ -3,17 +3,24 @@
  */
 package com.example.shoppinglist
 
+import com.example.shoppinglist.entities.ShoppingItem
+import com.example.shoppinglist.repositories.ShoppingItemRepository
 import io.restassured.RestAssured
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 internal class AppTest {
+
+  @Autowired private lateinit var repo : ShoppingItemRepository
 
   @LocalServerPort
   var localPort: Int = 0
@@ -21,10 +28,11 @@ internal class AppTest {
   @BeforeEach
   fun setUp() {
     RestAssured.port = localPort
+    repo.deleteAll()
   }
 
   @Test
-  fun appHasAGreeting() {
+  fun `it returns empty items when none created`() {
     val items =
       RestAssured.get("/items")
       .then()
@@ -32,6 +40,30 @@ internal class AppTest {
       .extract()
       .`as`(List::class.java)
 
-    assertFalse { items.isEmpty() }
+    assertTrue { items.isEmpty() }
   }
+
+  @org.junit.jupiter.api.Test
+  fun `it retrieves created products`() {
+    postShoppingItem("Milk")
+    postShoppingItem("Eggs")
+
+    val items =
+      RestAssured.get("/items")
+        .then()
+        .statusCode(200)
+        .extract()
+        .`as`(List::class.java)
+
+    assertFalse { items.isEmpty() }
+    assertThat(items).containsExactly("Milk", "Eggs")
+  }
+
+  private fun postShoppingItem(itemName: String) =
+    RestAssured
+      .given()
+      .body(itemName)
+      .post("/items")
+      .then()
+      .statusCode(201)
 }
