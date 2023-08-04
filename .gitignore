@@ -5,3 +5,7 @@ vendor/*
 *.json
 !jsonnetfile.json
 !jsonnetfile.lock.json
+
+.gradle/
+.idea
+build/
