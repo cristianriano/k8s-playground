@@ -11,7 +11,7 @@ ENV ENVIRONMENT="${SPRING_ENV}"
 
 USER 1000
 
-COPY --chown=1000:1000 kotlin-spring/build/libs/app.jar ./
+COPY --chown=1000:1000 build/libs/app.jar ./
 
 EXPOSE 8080
 ENTRYPOINT ["java"]

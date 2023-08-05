@@ -31,11 +31,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
+          cache: 'gradle'
 
       - name: Gradle Cache
         uses: actions/cache@v3
         with:
-          path: .gradle
+          path: ~/.gradle/
           key: gradle-cache
 
       - name: Build jar
@@ -61,7 +62,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: kotlin-spring
+          context: kotlin-spring/
           push: true
           tags: cristianriano/shopping-list-spring:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
