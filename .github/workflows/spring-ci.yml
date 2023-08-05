@@ -1,0 +1,33 @@
+name: Spring CI
+
+on: pull_request
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: "Build and Test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Gradle project
+        uses: ./.github/actions/java-setup
+        with:
+          java_version: '17'
+
+      - name: Compile
+        run: ./gradlew classes
+
+      - name: Tests
+        run: ./gradlew test
