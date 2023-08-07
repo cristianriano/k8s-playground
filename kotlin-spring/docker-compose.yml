@@ -1,0 +1,24 @@
+version: "3.2"
+services:
+  shoppinglist:
+    image: cristianriano/shopping-list-spring:latest
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+  mysql:
+    image: mysql:8
+    ports:
+      - "3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE=shopping_list
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    volumes:
+      - ./bin/setup_schema.sql:/docker-entrypoint-initdb.d/01_setup_schema.sql

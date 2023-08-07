@@ -12,7 +12,7 @@
 ## MySQL setup
 
 1. Run a MySQL container with `docker run --rm --name shopping-list-mysql -p 3307:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql:8`
-2. Config the db with the script provided `./bin/setup_db.sh`
+2. Config the db user with the script provided `./bin/setup_db_user.sh` and create the schema `mysql -h 127.0.0.1 -P 3307 < ./bin/setup_schema.sql`
 
 ## Running the app
 
