@@ -58,3 +58,19 @@ application {
   // Define the main class for the application.
   mainClass.set(javaMainClass)
 }
+
+// Custom tasks examples
+tasks.register<JavaExec>("runAsJavaExec") {
+  group = "Execution"
+  description = "Run the main class with JavaExecTask"
+  mainClass.set(javaMainClass)
+  classpath = sourceSets.main.get().runtimeClasspath
+}
+
+tasks.register<Exec>("runAsExec") {
+  group = "Execution"
+  description = "Run the main class with ExecTask"
+
+  dependsOn("build")
+  commandLine("java", "-classpath", sourceSets.main.get().runtimeClasspath.asPath, javaMainClass)
+}

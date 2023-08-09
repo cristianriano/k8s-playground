@@ -18,3 +18,19 @@
 
 1. Once it runs you can add new items to the list with `curl -X POST localhost:8080/items -d 'Milk'`
 2. And retrieve them `curl localhost:8080/items`
+
+## Gradle
+
+### build.gradle.kts
+
+- Add the `application` plugin at the top, a core Gradle plugin that defines a collection of ready-to-use tasks that help us package and distribute our application.
+   - Define the main class `application { mainClass.set("org.example.Main") }` and can run the app with `./gradlew run`
+- Register a task of type `<runAsJavaExec>` that does the same as run
+   - Specify main class and classpath. The classpath is computed from the default properties of the build output and contains the correct path where the compiled class is actually placed.
+- Register a task of type `<Exec>` task which can run any executable, in this case Java
+   - Needs to specify the dependency from build since it needs to compile first the project
+
+### settings.gradle.kts
+
+- We include here the repositories used for dependency resolution
+   - If there is a private Maven repo should be configured here
