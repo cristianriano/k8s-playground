@@ -10,8 +10,9 @@ You need to install minikube to run this demo and a driver.
 
 2. Install the desired driver with brew (more available [here](https://minikube.sigs.k8s.io/docs/drivers/)):
   - `docker` (already available but doesn't support Ingress)
+  - `qemu` (recommended)
   - `virtualbox` (not working atm)
-  - `hyperkit` (recommended)
+  - `hyperkit` (not working on M chips)
 
 3. Start the cluster with\
 `minikube start --driver=<step_2>`
