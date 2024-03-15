@@ -14,6 +14,6 @@ More on the [official doc](https://kubernetes.io/docs/concepts/extend-kubernetes
 4. Add fields to the Spec of the new resource in `api/v1/<resource>_types.go` in the `<resource>Spec` struct
 5. Implement the reconciliation business logic in `internal/controllers/<resource>_controller.go`
 6. When updating the Spec of the CRD update the generated yml with `make manifests`
-7. Apply the latest version of the crd `kubectl apply -f config/crd/bases/<domain>_<resource>.yaml`
+7. Install the crds in the cluster `make install`
 8. Last run the operator `make run`
 9. Can be testing by creating a resource of the defined spec and checking resulting jobs and containers

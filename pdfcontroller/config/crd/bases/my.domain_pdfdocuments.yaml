@@ -39,9 +39,9 @@ spec:
           spec:
             description: PdfDocumentSpec defines the desired state of PdfDocument
             properties:
-              documentName:
-                type: string
               text:
+                type: string
+              title:
                 type: string
             type: object
           status:

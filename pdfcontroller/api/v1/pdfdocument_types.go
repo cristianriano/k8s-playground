@@ -28,8 +28,8 @@ type PdfDocumentSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	DocumentName string `json:"documentName,omitempty"`
-	Text         string `json:"text,omitempty"`
+	Title string `json:"title,omitempty"`
+	Text  string `json:"text,omitempty"`
 }
 
 // PdfDocumentStatus defines the observed state of PdfDocument

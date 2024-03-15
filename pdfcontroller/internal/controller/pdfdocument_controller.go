@@ -18,7 +18,6 @@ package controller
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	v1 "k8s.io/api/batch/v1"
 	v12 "k8s.io/api/core/v1"
@@ -87,7 +86,7 @@ func (r *PdfDocumentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (r *PdfDocumentReconciler) createJob(pdfDoc mydomainv1.PdfDocument) (v1.Job, error) {
 	image := "knsit/pandoc"
-	base64text := base64.StdEncoding.EncodeToString([]byte(pdfDoc.Spec.Text))
+	//base64text := base64.StdEncoding.EncodeToString([]byte(pdfDoc.Spec.Text))
 
 	jobSpec := v1.Job{
 		TypeMeta: metav1.TypeMeta{APIVersion: v1.SchemeGroupVersion.String(), Kind: "Job"},
@@ -104,7 +103,7 @@ func (r *PdfDocumentReconciler) createJob(pdfDoc mydomainv1.PdfDocument) (v1.Job
 							Name:    "persist-md",
 							Image:   "alpine",
 							Command: []string{"/bin/sh"},
-							Args:    []string{"-c", fmt.Sprintf("echo %s > /data/text.md", base64text)},
+							Args:    []string{"-c", fmt.Sprintf("echo %s > /data/text.md", pdfDoc.Spec.Text)},
 							VolumeMounts: []v12.VolumeMount{
 								{
 									Name:      "data-volume",
@@ -116,7 +115,7 @@ func (r *PdfDocumentReconciler) createJob(pdfDoc mydomainv1.PdfDocument) (v1.Job
 							Name:    "convert-to-pdf",
 							Image:   image,
 							Command: []string{"/bin/sh"},
-							Args:    []string{"-c", fmt.Sprintf("pandoc -s -o /data/%s.pdf /data/text.md", pdfDoc.Spec.DocumentName)},
+							Args:    []string{"-c", "pandoc", "/data/text.md", "-o", fmt.Sprintf("/data/%s.pdf", pdfDoc.Spec.Title)},
 							VolumeMounts: []v12.VolumeMount{
 								{
 									Name:      "data-volume",

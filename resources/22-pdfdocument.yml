@@ -1,9 +1,10 @@
-apiVersion: k8s.example.com/v1
+#apiVersion: k8s.example.com/v1
+apiVersion: my.domain/v1
 kind: PdfDocument
 metadata:
   name: my-document
 spec:
-  title: "My Document"
+  title: "Document"
   text: |
     # My Document
     Hello **world!**
