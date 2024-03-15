@@ -18,7 +18,11 @@ package controller
 
 import (
 	"context"
-
+	"encoding/base64"
+	"fmt"
+	v1 "k8s.io/api/batch/v1"
+	v12 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,9 +51,29 @@ type PdfDocumentReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.17.0/pkg/reconcile
 func (r *PdfDocumentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	_ = log.FromContext(ctx, "pdfdocument", req.NamespacedName)
 
-	// TODO(user): your logic here
+	// Start 2 init containers, the first one will persist the text and the second one will convert the text to a PDF
+	// Main container will just sleep
+
+	// 1. Get the PdfDocument resource
+	var pdfDoc mydomainv1.PdfDocument
+	if err := r.Get(ctx, req.NamespacedName, &pdfDoc); err != nil {
+		log.Log.Error(err, "unable to fetch PdfDocument")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	// 2. Create job spec with the init containers
+	jobSpec, err := r.createJob(pdfDoc)
+	if err != nil {
+		log.Log.Error(err, "failed to create Job spec")
+		return ctrl.Result{}, err
+	}
+
+	// 3. Create the job
+	if err := r.Create(ctx, &jobSpec); err != nil {
+		log.Log.Error(err, "unable to create Job")
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -59,4 +83,73 @@ func (r *PdfDocumentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&mydomainv1.PdfDocument{}).
 		Complete(r)
+}
+
+func (r *PdfDocumentReconciler) createJob(pdfDoc mydomainv1.PdfDocument) (v1.Job, error) {
+	image := "knsit/pandoc"
+	base64text := base64.StdEncoding.EncodeToString([]byte(pdfDoc.Spec.Text))
+
+	jobSpec := v1.Job{
+		TypeMeta: metav1.TypeMeta{APIVersion: v1.SchemeGroupVersion.String(), Kind: "Job"},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      pdfDoc.Name + "-job",
+			Namespace: pdfDoc.Namespace,
+		},
+		Spec: v1.JobSpec{
+			Template: v12.PodTemplateSpec{
+				Spec: v12.PodSpec{
+					RestartPolicy: v12.RestartPolicyOnFailure,
+					InitContainers: []v12.Container{
+						{
+							Name:    "persist-md",
+							Image:   "alpine",
+							Command: []string{"/bin/sh"},
+							Args:    []string{"-c", fmt.Sprintf("echo %s > /data/text.md", base64text)},
+							VolumeMounts: []v12.VolumeMount{
+								{
+									Name:      "data-volume",
+									MountPath: "/data",
+								},
+							},
+						},
+						{
+							Name:    "convert-to-pdf",
+							Image:   image,
+							Command: []string{"/bin/sh"},
+							Args:    []string{"-c", fmt.Sprintf("pandoc -s -o /data/%s.pdf /data/text.md", pdfDoc.Spec.DocumentName)},
+							VolumeMounts: []v12.VolumeMount{
+								{
+									Name:      "data-volume",
+									MountPath: "/data",
+								},
+							},
+						},
+					},
+					Containers: []v12.Container{
+						{
+							Name:    "main",
+							Image:   "alpine",
+							Command: []string{"/bin/sh", "-c", "sleep 1800"},
+							VolumeMounts: []v12.VolumeMount{
+								{
+									Name:      "data-volume",
+									MountPath: "/data",
+								},
+							},
+						},
+					},
+					Volumes: []v12.Volume{
+						{
+							Name: "data-volume",
+							VolumeSource: v12.VolumeSource{
+								EmptyDir: &v12.EmptyDirVolumeSource{},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	return jobSpec, nil
 }

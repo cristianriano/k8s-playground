@@ -28,8 +28,8 @@ type PdfDocumentSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of PdfDocument. Edit pdfdocument_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	DocumentName string `json:"documentName,omitempty"`
+	Text         string `json:"text,omitempty"`
 }
 
 // PdfDocumentStatus defines the observed state of PdfDocument
