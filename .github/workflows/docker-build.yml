@@ -5,6 +5,8 @@ on:
     branches:
       - master
       - main
+    paths:
+      - 'kotlin-spring/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
